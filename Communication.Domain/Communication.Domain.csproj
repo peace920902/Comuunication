@@ -6,6 +6,10 @@
     <Folder Include="Users\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Line.Messaging" Version="1.4.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Conmmunication.Domain.Contract\Communication.Domain.Shared.csproj" />
   </ItemGroup>
 </Project>

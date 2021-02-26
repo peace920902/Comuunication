@@ -1,8 +1,8 @@
 ﻿namespace Communication.Domain.Line
 {
-    public class LineRequestObject
+    public class LineVerifyObject
     {
         public string AuthToken { get; set; }
-        public dynamic Content { get; set; }
+        public string Content { get; set; }
     }
 }
