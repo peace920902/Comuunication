@@ -4,14 +4,13 @@ using System.Threading.Tasks;
 
 namespace Communication.Domain.Bots
 {
-    public abstract class BaseBot<TVerify,  TSendMessage, TMessage> : IBotService< TVerify,  TSendMessage,  TMessage>
+    public abstract class BaseBot<TVerify, TReceivedMessage, TSendMessage > : IBotService< TVerify, TReceivedMessage, TSendMessage>
     {
         protected BotInfo BotInfo;
 
-        public abstract Task ReceiveMessages(Func<TMessage, Task> handleMessageFunc);
-
         public abstract bool VerifyMessage(TVerify input);
+        public abstract Task OnMessageReceivedAsync(TReceivedMessage message);
+        public abstract Task SendMessageAsync(IEnumerable<TSendMessage> messages);
 
-        public abstract Task<bool> SendMessage(IEnumerable<TSendMessage> messages);
     }
 }

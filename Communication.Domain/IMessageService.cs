@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 
 namespace Communication.Domain
 {
-    public interface IMessageService<out TMessage>
+    public interface IMessageService<in TReceivedMessage, in TSendMessage>
     {
-        Task ReceiveMessages(Func<TMessage, Task> handleMessageFunc);
+        public Task OnMessageReceivedAsync(TReceivedMessage message);
+        public Task SendMessageAsync(IEnumerable<TSendMessage> messages);
     }
 }

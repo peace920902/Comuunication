@@ -20,7 +20,6 @@ namespace Communication.Controllers.Line
         [HttpPost]
         public async Task ReceiveMessage(dynamic content)
         {
-            var s = content.ToString();
             var header = Request.Headers.TryGetValue("X-Line-Signature", out var authToken);
             Console.WriteLine(authToken);
         }
