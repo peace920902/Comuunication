@@ -11,6 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Communication.Domain;
+using Communication.Domain.Bots;
+using Communication.Domain.Line;
 
 namespace Communication
 {
@@ -28,6 +31,11 @@ namespace Communication
         {
 
             services.AddControllers();
+            services.AddSingleton<ILineService, LineService>();
+            services.AddSingleton<ILineMessagingClientFactory, LineMessagingClientFactory>();
+            services.AddSingleton<ILineBotFactory, LineBotFactory>();
+            services.AddSingleton<IGuidFactory, GuidFactory>();
+            services.AddSingleton<IBotRepository, BotRepository>(); 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Communication", Version = "v1" });

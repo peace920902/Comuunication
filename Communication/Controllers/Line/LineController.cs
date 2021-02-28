@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Communication.Domain.Line;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -12,16 +13,23 @@ namespace Communication.Controllers.Line
     [Route("api/[controller]")]
     public class LineController : Controller
     {
-        public LineController()
+        private readonly ILineService _lineService;
+
+        public LineController(ILineService lineService)
         {
-            
+            _lineService = lineService;
         }
-        
+
         [HttpPost]
-        public async Task ReceiveMessage(dynamic content)
+        public async Task<IActionResult> ReceiveMessage(dynamic content)
         {
-            var header = Request.Headers.TryGetValue("X-Line-Signature", out var authToken);
-            Console.WriteLine(authToken);
+            var task = _lineService.OnMessageReceivedAsync(
+                new LineRequestObject
+                {
+                    AuthToken = Request.Headers.TryGetValue("X-Line-Signature", out var authToken) ? authToken.ToString() : null,
+                    Content = content
+                });
+            return Ok();
         }
     }
 }
