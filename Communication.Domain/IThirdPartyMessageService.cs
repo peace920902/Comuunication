@@ -6,17 +6,20 @@ using Communication.Domain.Line;
 
 namespace Communication.Domain
 {
-    public abstract class BaseThirdPartyService<TParsedMessage, TReceivedMessage, TSendMessage, TVerifyObject, TBotReceivedMessage, TBotSendMessage> : IMessageService<TReceivedMessage, TSendMessage> 
+    public abstract class
+        BaseThirdPartyService<TParsedMessage, TReceivedMessage, TSendMessage, TVerifyObject, TBotReceivedMessage, TBotSendMessage, TBot, TBotManger> : IMessageService<TReceivedMessage, TSendMessage>
+        where TBot :IBotService<TVerifyObject, TBotReceivedMessage, TBotSendMessage>
+        where TBotManger : IBotManager<TBot, TVerifyObject, TBotReceivedMessage, TBotSendMessage>
     {
-        protected ConcurrentDictionary<string, IBotService<TVerifyObject, TBotReceivedMessage, TBotSendMessage>> BotServices;
+        protected TBotManger BotManager;
         
         protected abstract Task<IEnumerable<Message>> ParseMessages(TParsedMessage message);
         public abstract Task OnMessageReceivedAsync(TReceivedMessage message);
         public abstract Task SendMessageAsync(IEnumerable<TSendMessage> messages);
 
-        protected BaseThirdPartyService()
+        protected BaseThirdPartyService(TBotManger botManager)
         {
-            BotServices = new ConcurrentDictionary<string, IBotService<TVerifyObject, TBotReceivedMessage, TBotSendMessage>>();
+            BotManager = botManager;
         }
     }
 }

@@ -19,6 +19,7 @@ namespace Communication.Domain
         protected string FileName = "temp.json";
         public IQueryable<T> GetAll()
         {
+            return new List<T>().AsQueryable();
             return JsonSerializer.Deserialize<IQueryable<T>>(GetJsonAsync().Result);
         }
 
