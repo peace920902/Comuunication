@@ -5,9 +5,14 @@ using Line.Messaging;
 
 namespace Communication.Domain.Line
 {
-    public class LineBot: BaseBot<LineVerifyObject, string, string>
+    public class LineBot: BaseBot<LineVerifyObject, string, LineSendObject>
     {
         private readonly ILineMessagingClient _lineMessagingClient;
+        public LineBot(ILineMessagingClient lineMessagingClient)
+        {
+            _lineMessagingClient = lineMessagingClient;
+        }
+         
         public override bool VerifyMessage(LineVerifyObject input)
         {
             return true;
@@ -18,19 +23,15 @@ namespace Communication.Domain.Line
             return;
         }
 
-        public override async Task SendMessageAsync(IEnumerable<string> messages)
+        public override async Task SendMessageAsync(IEnumerable<LineSendObject> messages)
         {
             var tasks = new List<Task>();
             foreach (var message in messages)
             {
-                tasks.Add(_lineMessagingClient.PushMessageAsync(message, message));
+                tasks.Add(_lineMessagingClient.PushMessageAsync(message.UserId, "你好"));
+                //tasks.Add(_lineMessagingClient.PushMessageAsync(message.UserId, message.Content));
             }
             await Task.WhenAll(tasks);
-        }
-
-        public LineBot(ILineMessagingClient lineMessagingClient)
-        {
-            _lineMessagingClient = lineMessagingClient;
         }
     }
 }

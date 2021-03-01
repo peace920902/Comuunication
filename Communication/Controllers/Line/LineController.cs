@@ -23,12 +23,13 @@ namespace Communication.Controllers.Line
         [HttpPost]
         public async Task<IActionResult> ReceiveMessage(dynamic content)
         {
-            var task = _lineService.OnMessageReceivedAsync(
+            await _lineService.OnMessageReceivedAsync(
                 new LineRequestObject
                 {
-                    AuthToken = Request.Headers.TryGetValue("X-Line-Signature", out var authToken) ? authToken.ToString() : null,
+                    AuthToken = Request.Headers.TryGetValue(LineDefine.LineAuthorizeHeader, out var authToken) ? authToken.ToString() : null,
                     Content = content
                 });
+                      
             return Ok();
         }
     }

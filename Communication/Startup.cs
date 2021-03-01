@@ -35,7 +35,8 @@ namespace Communication
             services.AddSingleton<ILineMessagingClientFactory, LineMessagingClientFactory>();
             services.AddSingleton<ILineBotFactory, LineBotFactory>();
             services.AddSingleton<IGuidFactory, GuidFactory>();
-            services.AddSingleton<IBotRepository, BotRepository>(); 
+            services.AddSingleton<IBotRepository, BotRepository>();
+            services.AddSingleton<ILineBotManager, LineBotManager>();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Communication", Version = "v1" });

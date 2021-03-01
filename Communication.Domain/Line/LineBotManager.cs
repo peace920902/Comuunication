@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Communication.Domain.Bots;
@@ -20,7 +21,7 @@ namespace Communication.Domain.Line
             Initialize();
         }
 
-        public void Initialize()
+        private void Initialize()
         {
             var botInfos = _botRepository.GetAll().ToList();
             foreach (var lineBot in botInfos.Select(botInfo => _lineBotFactory.Create(botInfo)).Where(lineBot => lineBot != null))
@@ -34,19 +35,36 @@ namespace Communication.Domain.Line
             return _bots.ContainsKey(botId) ? _bots[botId] : null;
         }
 
-        public void SetThirdPartyId(string botId, string thirdPartyId)
+        public async Task SetThirdPartyId(string botId, string thirdPartyId)
         {
             if (!_bots.ContainsKey(botId)) return;
-            _bots[botId].BotInfo.ThirdPartyId = thirdPartyId;
+            var botInfo = _bots[botId].BotInfo;
+            botInfo.ThirdPartyId = thirdPartyId;
+            await _botRepository.UpdateAsync(botInfo.Id, botInfo);
         }
 
-        public void ChangeBotSecret(string botId, BotSecret botSecret)
+        public async Task<LineBot> ChangeBotSecret(string botId, BotSecret botSecret)
         {
-            if (!_bots.ContainsKey(botId)) return;
+            if (!_bots.ContainsKey(botId)) return null;
             var botInfo = _bots[botId].BotInfo;
             botInfo.BotSecret = botSecret;
             var lineBot = _lineBotFactory.Create(botInfo);
             _bots[botId] = lineBot;
+            await _botRepository.UpdateAsync(lineBot.BotInfo.Id, lineBot.BotInfo);
+            return lineBot;
+        }
+
+        public async Task<LineBot> CreateBot(BotInfo botInfo)
+        {
+            var lineBot = _lineBotFactory.Create(botInfo);
+            await _botRepository.CreateAsync(lineBot.BotInfo);
+            _bots.TryAdd(lineBot.BotInfo.Id, lineBot);
+            return lineBot;
+        }
+
+        public IEnumerable<LineBot> GetNoneThirdPartyIdBots()
+        {
+            return _bots.Values.Where(x => string.IsNullOrEmpty(x.BotInfo.ThirdPartyId));
         }
     }
 }
