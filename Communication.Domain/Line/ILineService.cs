@@ -1,6 +1,6 @@
 ﻿namespace Communication.Domain.Line
 {
-    public interface ILineService:IMessageService<LineRequestObject, string>
+    public interface ILineService:IMessageService<LineRequestObject, Message>
     {
         
     }

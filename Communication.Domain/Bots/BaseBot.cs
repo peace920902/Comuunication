@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Communication.Domain.Bots
 {
-    public abstract class BaseBot<TVerify, TReceivedMessage, TSendMessage > : IBotService< TVerify, TReceivedMessage, TSendMessage>
+    public abstract class BaseBot<TVerify, TReceivedMessage, TSendMessage > : IBotService< TVerify>, IMessageService<TReceivedMessage, TSendMessage>
     {
         public BotInfo BotInfo { get; }
         public abstract bool VerifyMessage(TVerify input);

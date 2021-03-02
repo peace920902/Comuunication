@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Communication.Domain.Bots
 {
-    public interface IBotService<in TVerify, in TReceivedMessage, in TSendMessage> : IMessageService<TReceivedMessage,TSendMessage>
+    public interface IBotService<in TVerify>
     {
         bool VerifyMessage(TVerify input);
     }

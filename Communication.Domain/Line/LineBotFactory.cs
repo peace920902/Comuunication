@@ -20,7 +20,7 @@ namespace Communication.Domain.Line
             lineBot.BotInfo.BotSecret = new BotSecret {SecretKey = botInfo.BotSecret.SecretKey, Token = botInfo.BotSecret.Token};
             lineBot.BotInfo.Name = botInfo.Name;
             lineBot.BotInfo.ThirdPartyId = botInfo.ThirdPartyId;
-            lineBot.BotInfo.Id = _guidFactory.CreateId();
+            lineBot.BotInfo.Id = string.IsNullOrEmpty(botInfo.Id)?_guidFactory.CreateId(): botInfo.Id;
             return lineBot;
         }
     }

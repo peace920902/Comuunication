@@ -19,8 +19,11 @@ namespace Communication.Domain
         protected string FileName = "temp.json";
         public IQueryable<T> GetAll()
         {
-            return new List<T>().AsQueryable();
-            return JsonSerializer.Deserialize<IQueryable<T>>(GetJsonAsync().Result);
+            //return new List<T>().AsQueryable();
+            var result = GetJsonAsync().Result;
+            if (string.IsNullOrEmpty(result)) return new List<T>().AsQueryable();
+            var enumerable = JsonSerializer.Deserialize<IEnumerable<T>>(result);
+            return enumerable==null? new List<T>().AsQueryable(): enumerable.AsQueryable();
         }
 
         public async Task<T> FindAsync(TId id)
@@ -46,6 +49,7 @@ namespace Communication.Domain
             if (entity == null) return null;
             data.Remove(entity);
             data.Add(item);
+            await SaveDataAsync(JsonSerializer.Serialize(data));
             return item;
         }
 
@@ -62,7 +66,11 @@ namespace Communication.Domain
         protected async Task<string> GetJsonAsync()
         {
             var filePath = BaseFilePath + FileName;
-            if (!File.Exists(filePath)) File.Create(filePath);
+            if (!File.Exists(filePath))
+            {
+                var fileStream = File.Create(filePath);
+                await fileStream.DisposeAsync();
+            }
 
             using var streamReader= new StreamReader(filePath);
             var json = await streamReader.ReadToEndAsync();

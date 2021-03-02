@@ -35,6 +35,11 @@ namespace Communication.Domain.Line
             return _bots.ContainsKey(botId) ? _bots[botId] : null;
         }
 
+        public LineBot GetBotByThirdPartyBotId(string thirdPartyBotId)
+        {
+            return _bots.Values.FirstOrDefault(x => x.BotInfo.ThirdPartyId == thirdPartyBotId);
+        }
+
         public async Task SetThirdPartyId(string botId, string thirdPartyId)
         {
             if (!_bots.ContainsKey(botId)) return;

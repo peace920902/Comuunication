@@ -2,7 +2,7 @@
 
 namespace Communication.Domain.Bots
 {
-    public interface IBotManager<TBot, TVerify, TReceivedMessage, TSendMessage> where TBot: IBotService<TVerify, TReceivedMessage, TSendMessage>
+    public interface IBotManager<TBot, TVerify, TReceivedMessage, TSendMessage> where TBot : BaseBot<TVerify, TReceivedMessage, TSendMessage>
     {
         TBot GetBot(string botId);
         Task SetThirdPartyId(string botId, string thirdPartyId);
