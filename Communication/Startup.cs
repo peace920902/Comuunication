@@ -11,9 +11,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Communication.Application;
+using Communication.Application.Chat;
 using Communication.Domain;
 using Communication.Domain.Bots;
 using Communication.Domain.Line;
+using Communication.Domain.Users;
+using Communication.Hubs;
 
 namespace Communication
 {
@@ -29,14 +33,18 @@ namespace Communication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
+            services.AddSignalR();
+            services.AddSingleton<IMessageHandler, MessageHandler>();
             services.AddSingleton<ILineService, LineService>();
+            services.AddSingleton<IUserRepository, UserRepository>();
             services.AddSingleton<ILineMessagingClientFactory, LineMessagingClientFactory>();
             services.AddSingleton<ILineBotFactory, LineBotFactory>();
             services.AddSingleton<IGuidFactory, GuidFactory>();
             services.AddSingleton<IBotRepository, BotRepository>();
             services.AddSingleton<ILineBotManager, LineBotManager>();
+            services.AddSingleton<IChatAppService, ChatAppService>();
+            //services.AddAutoMapper(typeof(AppMapperProfile));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Communication", Version = "v1" });
@@ -61,6 +69,7 @@ namespace Communication
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<ChatHub>("/chat");
                 endpoints.MapControllers();
             });
         }

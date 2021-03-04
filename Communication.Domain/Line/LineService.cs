@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 using System.Threading.Tasks;
 using Communication.Domain.Shared;
 using Communication.Domain.Users;
-using Line.Messaging;
 using Line.Messaging.Webhooks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -17,11 +13,14 @@ namespace Communication.Domain.Line
 {
     public class LineService : BaseThirdPartyService<LineParseObject, LineRequestObject, Message, LineVerifyObject, string, LineSendObject, LineBot, ILineBotManager>, ILineService
     {
+        private readonly IMessageHandler _messageHandler;
         private readonly ILogger<LineService> _logger;
 
-        public LineService(ILineBotManager botManager, ILogger<LineService> logger) : base(botManager)
+        public LineService(ILineBotManager botManager,IMessageHandler messageHandler, ILogger<LineService> logger) : base(botManager)
         {
+            _messageHandler = messageHandler;
             _logger = logger;
+            _messageHandler.RegisterSendMessageFunc(ChatType.Line, SendMessageAsync);
         }
 
         public override async Task OnMessageReceivedAsync(LineRequestObject requestObject)
@@ -74,7 +73,7 @@ namespace Communication.Domain.Line
                 }
             }
             var messages = await ParseMessages(new LineParseObject { BotId = bot.BotInfo.Id, Content = content.ToString() });
-            //todo send to signalR
+            await _messageHandler.OnMessageReceivedAsync(messages);
         }
 
         public override async Task SendMessageAsync(IEnumerable<Message> messages)
@@ -116,8 +115,8 @@ namespace Communication.Domain.Line
                     case MessageEvent messageEvent:
                         messages.Add(ParseToMessage(lineParseObject.BotId, messageEvent));
                         break;
-                    case JoinEvent joinEvent:
-                        var message = await ParseToMessage(lineParseObject.BotId, joinEvent);
+                    case FollowEvent followEvent:
+                        var message = await ParseToMessage(lineParseObject.BotId, followEvent);
                         if (message != null) messages.Add(message);
                         break;
                 }
@@ -131,7 +130,9 @@ namespace Communication.Domain.Line
             {
                 MessageType = (MessageType)messageEvent.Message.Type,
                 BotId = botId,
-                User = new User { ThirdPartyId = messageEvent.Source.UserId, ThirdPartyType = ThirdPartyType.Line }
+                User = new User { ThirdPartyId = messageEvent.Source.UserId, ChatType = ChatType.Line },
+                TimeStamp = messageEvent.Timestamp,
+                Destination = ChatType.ChatInterface
             };
 
             message.Content = messageEvent.Message switch
@@ -144,10 +145,10 @@ namespace Communication.Domain.Line
             return message;
         }
 
-        private async Task<Message> ParseToMessage(string botId, JoinEvent joinEvent)
+        private async Task<Message> ParseToMessage(string botId, FollowEvent followEvent)
         {
             var lineBot = BotManager.GetBot(botId);
-            var userInfo = await lineBot.GetUserProfileAsync(joinEvent.Source.UserId);
+            var userInfo = await lineBot.GetUserProfileAsync(followEvent.Source.UserId);
             if (userInfo == null) return null;
 
             return new Message
@@ -158,8 +159,10 @@ namespace Communication.Domain.Line
                 {
                     Name = userInfo.DisplayName,
                     ThirdPartyId = userInfo.UserId,
-                    ThirdPartyType = ThirdPartyType.Line
-                }
+                    ChatType = ChatType.Line
+                },
+                TimeStamp = followEvent.Timestamp,
+                Destination = ChatType.ChatInterface
             };
         }
 

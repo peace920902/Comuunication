@@ -6,8 +6,7 @@ using Communication.Domain.Line;
 
 namespace Communication.Domain
 {
-    public abstract class
-        BaseThirdPartyService<TParsedMessage, TReceivedMessage, TSendMessage, TVerifyObject, TBotReceivedMessage, TBotSendMessage, TBot, TBotManger> : IMessageService<TReceivedMessage, TSendMessage>
+    public abstract class BaseThirdPartyService<TParsedMessage, TReceivedMessage, TSendMessage, TVerifyObject, TBotReceivedMessage, TBotSendMessage, TBot, TBotManger> : IMessageService<TReceivedMessage, TSendMessage>
         where TBot : BaseBot<TVerifyObject, TBotReceivedMessage, TBotSendMessage>
         where TBotManger : IBotManager<TBot, TVerifyObject, TBotReceivedMessage, TBotSendMessage>
     {

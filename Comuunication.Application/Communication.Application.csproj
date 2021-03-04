@@ -1,14 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="Line.Messaging" Version="1.4.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
   </ItemGroup>
+
   <ItemGroup>
+    <ProjectReference Include="..\Communication.Domain\Communication.Domain.csproj" />
     <ProjectReference Include="..\Conmmunication.Domain.Contract\Communication.Domain.Shared.csproj" />
   </ItemGroup>
+
 </Project>

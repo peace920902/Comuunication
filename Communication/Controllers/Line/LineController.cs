@@ -24,13 +24,13 @@ namespace Communication.Controllers.Line
         public async Task<IActionResult> ReceiveMessage(dynamic content)
         {
             var token = Request.Headers.TryGetValue(LineDefine.LineAuthorizeHeader, out var authToken) ? authToken.ToString() : null;
-            await _lineService.OnMessageReceivedAsync(
+            _lineService.OnMessageReceivedAsync(
                 new LineRequestObject
                 {
                     AuthToken = token,
                     Content = content
                 });
-                      
+
             return Ok();
         }
     }

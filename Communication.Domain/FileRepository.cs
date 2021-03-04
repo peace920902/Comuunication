@@ -29,12 +29,13 @@ namespace Communication.Domain
         public async Task<T> FindAsync(TId id)
         {
             var data = await GetDataAsync<IEnumerable<T>>();
-            return data.FirstOrDefault(x => x.Id.Equals(id));
+            return data?.FirstOrDefault(x => x.Id.Equals(id));
         }
 
         public async Task<T> CreateAsync(T item)
         {
             var data = await GetDataAsync<List<T>>();
+            data ??= new List<T>();
             var entity = data.FirstOrDefault(x => x.Id.Equals(item.Id));
             if (entity != null) return item;
             data.Add(item);
@@ -45,7 +46,7 @@ namespace Communication.Domain
         public async Task<T> UpdateAsync(TId id, T item)
         {
             var data = await GetDataAsync<List<T>>();
-            var entity = data.FirstOrDefault(x => x.Id.Equals(id));
+            var entity = data?.FirstOrDefault(x => x.Id.Equals(id));
             if (entity == null) return null;
             data.Remove(entity);
             data.Add(item);
@@ -90,7 +91,7 @@ namespace Communication.Domain
         protected async Task<TOutput> GetDataAsync<TOutput>()
         {
             var json = await GetJsonAsync();
-            return JsonSerializer.Deserialize<TOutput>(json);
+            return string.IsNullOrEmpty(json) ? default : JsonSerializer.Deserialize<TOutput>(json);
         }
     }
 }
