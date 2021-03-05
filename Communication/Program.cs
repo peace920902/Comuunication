@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Communication.Domain.Bots;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace Communication
@@ -43,6 +44,7 @@ namespace Communication
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .ConfigureServices(service=>service.AddHostedService<InitialService>());
     }
 }
