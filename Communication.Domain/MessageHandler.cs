@@ -53,6 +53,20 @@ namespace Communication.Domain
                         continue;
                     case MessageType.Text:
                         {
+                            var user =await _userRepository.GetUserByThirdPartyUserId(message.User.ThirdPartyId);
+                            if (user == null)
+                            {
+                                tasks.Add(_userRepository.CreateAsync(
+                                    new User
+                                    {
+                                        Id = _guidFactory.CreateId(),
+                                        Name = message.User.Name,
+                                        ThirdPartyId = message.User.ThirdPartyId,
+                                        ChatType = message.User.ChatType
+                                    }));
+                            }
+
+                            message.User = user;
                             var destination = message.Destination;
                             if (sendDict.ContainsKey(destination))
                                 sendDict[destination].Add(message);

@@ -45,6 +45,10 @@ namespace Communication
                 {
                     webBuilder.UseStartup<Startup>();
                 })
-                .ConfigureServices(service=>service.AddHostedService<InitialService>());
+                .ConfigureServices(service=>
+                {
+                    service.AddHostedService<InitialService>();
+                    service.AddHostedService<HubClient>();
+                });
     }
 }

@@ -13,11 +13,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Communication.Application;
 using Communication.Application.Chat;
+using Communication.Application.Hubs;
 using Communication.Domain;
 using Communication.Domain.Bots;
 using Communication.Domain.Line;
 using Communication.Domain.Users;
-using Communication.Hubs;
 
 namespace Communication
 {

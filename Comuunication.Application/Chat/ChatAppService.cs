@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Communication.Application.Hubs;
 using Communication.Domain;
 using Communication.Domain.Shared;
 using Communication.Domain.Shared.Messages;
 using Communication.Domain.Users;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
 namespace Communication.Application.Chat
@@ -16,13 +18,15 @@ namespace Communication.Application.Chat
         private readonly ILogger<ChatAppService> _logger;
         private readonly IMessageHandler _messageHandler;
         private readonly IUserRepository _userRepository;
-        private Func<MessageViewModel, Task> _sendMessageFunc;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public ChatAppService(ILogger<ChatAppService> logger,IMessageHandler messageHandler, IUserRepository userRepository)
+
+        public ChatAppService(ILogger<ChatAppService> logger,IMessageHandler messageHandler, IUserRepository userRepository, IHubContext<ChatHub> hubContext)
         {
             _logger = logger;
             _messageHandler = messageHandler;
             _userRepository = userRepository;
+            _hubContext = hubContext;
             _messageHandler.RegisterSendMessageFunc(ChatType.ChatInterface, SendMessageAsync);
         }
 
@@ -35,12 +39,7 @@ namespace Communication.Application.Chat
         public async Task SendMessageAsync(IEnumerable<Message> messages)
         {
             var messageViewModel = ParseToMessageViewModel(messages);
-            if (_sendMessageFunc != null) await _sendMessageFunc.Invoke(messageViewModel);
-        }
-
-        public void RegisterSendMessageFunc(Func<MessageViewModel, Task> sendMessageFunc)
-        {
-            _sendMessageFunc = sendMessageFunc;
+            await _hubContext.Clients.All.SendAsync("GetMessages", messageViewModel);
         }
 
         private async Task<IEnumerable<Message>> ParseToMessages(MessageViewModel messageViewModel)

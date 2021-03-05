@@ -4,12 +4,14 @@ using System.Threading.Tasks;
 using Communication.Application.Chat;
 using Communication.Domain;
 using Communication.Domain.Line;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 
 namespace Communication
 {
     public class InitialService: BackgroundService
     {
+        
         private readonly ILineService _lineService;
         private readonly IMessageHandler _messageHandler;
         private readonly IChatAppService _chatAppService;
@@ -19,6 +21,7 @@ namespace Communication
             _lineService = lineService;
             _messageHandler = messageHandler;
             _chatAppService = chatAppService;
+    
         }
         
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
