@@ -64,7 +64,7 @@ namespace Communication.Domain
             return true;
         }
 
-        protected async Task<string> GetJsonAsync()
+        private async Task<string> GetJsonAsync()
         {
             var filePath = BaseFilePath + FileName;
             if (!File.Exists(filePath))
@@ -78,7 +78,7 @@ namespace Communication.Domain
             return json;
         }
 
-        public async Task<bool> SaveDataAsync(string data)
+        private async Task<bool> SaveDataAsync(string data)
         {
             var filePath = BaseFilePath + FileName;
             if (!File.Exists(filePath)) return false;

@@ -66,7 +66,7 @@ namespace Communication.Application.Chat
             return messages;
         }
 
-        public MessageViewModel ParseToMessageViewModel(IEnumerable<Message> messages)
+        private MessageViewModel ParseToMessageViewModel(IEnumerable<Message> messages)
         {
             return new ()
             {

@@ -14,7 +14,6 @@ namespace Communication.Application.Hubs
             _chatAppService = chatAppService;
         }
 
-        
         [HubMethodName("SendMessages")]
         public async Task ReceiveMessage(MessageViewModel message)
         {

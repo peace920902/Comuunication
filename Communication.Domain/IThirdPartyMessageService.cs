@@ -10,7 +10,7 @@ namespace Communication.Domain
         where TBot : BaseBot<TVerifyObject, TBotReceivedMessage, TBotSendMessage>
         where TBotManger : IBotManager<TBot, TVerifyObject, TBotReceivedMessage, TBotSendMessage>
     {
-        protected TBotManger BotManager;
+        protected readonly TBotManger BotManager;
 
         protected abstract Task<IEnumerable<Message>> ParseMessages(TParsedMessage message);
         public abstract Task OnMessageReceivedAsync(TReceivedMessage message);
