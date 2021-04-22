@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Communication.Domain.Infrastructure;
 using Communication.Domain.Shared;
 using Communication.Domain.Shared.Messages;
 using Communication.Domain.Users;
@@ -42,38 +43,11 @@ namespace Communication.Domain
                 switch (message.MessageType)
                 {
                     case MessageType.Join:
-                        tasks.Add(_userRepository.CreateAsync(
-                            new User
-                            {
-                                Id = _guidFactory.CreateId(),
-                                Name = message.User.Name,
-                                ThirdPartyId = message.User.ThirdPartyId,
-                                ChatType = message.User.ChatType
-                            }));
+                        CreateUser(tasks, message);
                         continue;
                     case MessageType.Text:
-                        {
-                            var user =await _userRepository.GetUserByThirdPartyUserId(message.User.ThirdPartyId);
-                            if (user == null)
-                            {
-                                tasks.Add(_userRepository.CreateAsync(
-                                    new User
-                                    {
-                                        Id = _guidFactory.CreateId(),
-                                        Name = message.User.Name,
-                                        ThirdPartyId = message.User.ThirdPartyId,
-                                        ChatType = message.User.ChatType
-                                    }));
-                            }
-
-                            message.User = user;
-                            var destination = message.Destination;
-                            if (sendDict.ContainsKey(destination))
-                                sendDict[destination].Add(message);
-                            else
-                                sendDict.Add(destination, new List<Message> { message });
-                            continue;
-                        }
+                        await SaveMessage(message, tasks, sendDict);
+                        continue;
                 }
             }
 
@@ -88,6 +62,34 @@ namespace Communication.Domain
             }
 
             await Task.WhenAll(tasks);
+        }
+
+        private async Task SaveMessage(Message message, ICollection<Task> tasks, IDictionary<ChatType, List<Message>> sendDict)
+        {
+            var user = await _userRepository.GetUserByThirdPartyUserId(message.User.ThirdPartyId);
+            if (user == null)
+            {
+                CreateUser(tasks, message);
+            }
+
+            message.User = user;
+            var destination = message.Destination;
+            if (sendDict.ContainsKey(destination))
+                sendDict[destination].Add(message);
+            else
+                sendDict.Add(destination, new List<Message> {message});
+        }
+
+        private void CreateUser(ICollection<Task> tasks, Message message)
+        {
+            tasks.Add(_userRepository.CreateAsync(
+                new User
+                {
+                    Id = _guidFactory.CreateId(),
+                    Name = message.User.Name,
+                    ThirdPartyId = message.User.ThirdPartyId,
+                    ChatType = message.User.ChatType
+                }));
         }
 
         public async Task SendMessageAsync(IEnumerable<Message> messages)

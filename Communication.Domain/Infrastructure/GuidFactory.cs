@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Communication.Domain
+namespace Communication.Domain.Infrastructure
 {
     public class GuidFactory:IGuidFactory
     {
@@ -11,7 +11,7 @@ namespace Communication.Domain
 
         public string CreateId()
         {
-            return Create().ToString().Replace("-", "").Substring(0, 10);
+            return Create().ToString().Replace("-", "")[..10];
         }
     }
 }

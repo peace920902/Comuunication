@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Communication.Domain
+namespace Communication.Domain.Infrastructure
 {
     public interface IGuidFactory
     {

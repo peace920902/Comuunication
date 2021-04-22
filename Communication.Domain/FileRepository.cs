@@ -10,11 +10,6 @@ namespace Communication.Domain
 {
     public class FileRepository<TId,T> : IRepository<TId, T> where T : Entity<TId>
     {
-        public FileRepository()
-        {
-            
-        }
-
         protected const string BaseFilePath = @"C:\temp\";
         protected string FileName = "temp.json";
         public IQueryable<T> GetAll()

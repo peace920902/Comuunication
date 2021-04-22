@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Communication.Domain.Bots;
+using Communication.Domain.Infrastructure;
 
 namespace Communication.Domain.Line
 {

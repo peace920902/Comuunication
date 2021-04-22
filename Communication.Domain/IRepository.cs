@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Communication.Domain
 {
-    public interface IRepository<TId, T> where T: Entity<TId>
+    public interface IRepository<in TId, T> where T: Entity<TId>
     {
         IQueryable<T> GetAll();
         Task<T> FindAsync(TId id);

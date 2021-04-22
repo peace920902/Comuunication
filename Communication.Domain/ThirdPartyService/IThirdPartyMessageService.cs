@@ -1,10 +1,8 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Communication.Domain.Bots;
-using Communication.Domain.Line;
 
-namespace Communication.Domain
+namespace Communication.Domain.ThirdPartyService
 {
     public abstract class BaseThirdPartyService<TParsedMessage, TReceivedMessage, TSendMessage, TVerifyObject, TBotReceivedMessage, TBotSendMessage, TBot, TBotManger> : IMessageService<TReceivedMessage, TSendMessage>
         where TBot : BaseBot<TVerifyObject, TBotReceivedMessage, TBotSendMessage>

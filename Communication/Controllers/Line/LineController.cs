@@ -21,7 +21,7 @@ namespace Communication.Controllers.Line
         }
 
         [HttpPost]
-        public async Task<IActionResult> ReceiveMessage(dynamic content)
+        public Task<IActionResult> ReceiveMessage(dynamic content)
         {
             var token = Request.Headers.TryGetValue(LineDefine.LineAuthorizeHeader, out var authToken) ? authToken.ToString() : null;
             _lineService.OnMessageReceivedAsync(
@@ -31,7 +31,7 @@ namespace Communication.Controllers.Line
                     Content = content
                 });
 
-            return Ok();
+            return Task.FromResult<IActionResult>(Ok());
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Communication.Domain
+namespace Communication.Domain.Infrastructure
 {
     public interface IQueueService<T>
     {

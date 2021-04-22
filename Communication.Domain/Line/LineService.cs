@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Communication.Domain.Shared;
+using Communication.Domain.ThirdPartyService;
 using Communication.Domain.Users;
 using Line.Messaging.Webhooks;
 using Microsoft.Extensions.Logging;
@@ -16,7 +17,7 @@ namespace Communication.Domain.Line
         private readonly IMessageHandler _messageHandler;
         private readonly ILogger<LineService> _logger;
 
-        public LineService(ILineBotManager botManager,IMessageHandler messageHandler, ILogger<LineService> logger) : base(botManager)
+        public LineService(ILineBotManager botManager, IMessageHandler messageHandler, ILogger<LineService> logger) : base(botManager)
         {
             _messageHandler = messageHandler;
             _logger = logger;
@@ -26,8 +27,8 @@ namespace Communication.Domain.Line
         public override async Task OnMessageReceivedAsync(LineRequestObject requestObject)
         {
             var content = JsonConvert.DeserializeObject<dynamic>(requestObject.Content.ToString());
-            
-            var thirdPartyBotId = (string)content.destination;
+
+            var thirdPartyBotId = (string) content.destination;
             if (string.IsNullOrEmpty(thirdPartyBotId))
             {
                 _logger.Log(LogLevel.Error, "Cannot get thirdPartyBotId");
@@ -35,12 +36,12 @@ namespace Communication.Domain.Line
             }
 
             var bot = BotManager.GetBotByThirdPartyBotId(thirdPartyBotId);
-            var lineVerifyObject = new LineVerifyObject { AuthToken = requestObject.AuthToken, Content = requestObject.Content.ToString() };
+            var lineVerifyObject = new LineVerifyObject {AuthToken = requestObject.AuthToken, Content = requestObject.Content.ToString()};
             if (bot == null)
             {
                 var noneThirdPartyIdBots = BotManager.GetNoneThirdPartyIdBots();
                 var flag = false;
-                
+
                 foreach (var noneThirdPartyIdBot in noneThirdPartyIdBots)
                 {
                     if (!noneThirdPartyIdBot.VerifyMessage(lineVerifyObject)) continue;
@@ -48,6 +49,7 @@ namespace Communication.Domain.Line
                     flag = true;
                     break;
                 }
+
                 if (flag)
                 {
                     var lineBot = BotManager.GetBotByThirdPartyBotId(thirdPartyBotId);
@@ -56,6 +58,7 @@ namespace Communication.Domain.Line
                         _logger.Log(LogLevel.Error, $"LineBot should not be null. ThirdPartyBotId: {thirdPartyBotId}");
                         return;
                     }
+
                     bot = lineBot;
                 }
                 else
@@ -72,7 +75,8 @@ namespace Communication.Domain.Line
                     return;
                 }
             }
-            var messages = await ParseMessages(new LineParseObject { BotId = bot.BotInfo.Id, Content = content.ToString() });
+
+            var messages = await ParseMessages(new LineParseObject {BotId = bot.BotInfo.Id, Content = content.ToString()});
             await _messageHandler.OnMessageReceivedAsync(messages);
         }
 
@@ -80,15 +84,16 @@ namespace Communication.Domain.Line
         {
             var tasks = new List<Task>();
             var sendDict = new Dictionary<LineBot, List<LineSendObject>>();
-            foreach (var messageGroup in messages.GroupBy(x=>x.BotId))
+            foreach (var messageGroup in messages.GroupBy(x => x.BotId))
             {
                 var lineBot = BotManager.GetBot(messageGroup.Key);
                 if (lineBot == null)
                 {
-                    _logger.Log(LogLevel.Error,$"Cannot find bot: Id: {messageGroup.Key}");
+                    _logger.Log(LogLevel.Error, $"Cannot find bot: Id: {messageGroup.Key}");
                     continue;
                 }
-                if(!sendDict.ContainsKey(lineBot)) sendDict.Add(lineBot, messageGroup.Select(ParseToLineSendObject).ToList());
+
+                if (!sendDict.ContainsKey(lineBot)) sendDict.Add(lineBot, messageGroup.Select(ParseToLineSendObject).ToList());
                 else
                 {
                     sendDict[lineBot] ??= new List<LineSendObject>();
@@ -121,6 +126,7 @@ namespace Communication.Domain.Line
                         break;
                 }
             }
+
             return messages;
         }
 
@@ -128,9 +134,9 @@ namespace Communication.Domain.Line
         {
             var message = new Message
             {
-                MessageType = (MessageType)messageEvent.Message.Type,
+                MessageType = (MessageType) messageEvent.Message.Type,
                 BotId = botId,
-                User = new User { ThirdPartyId = messageEvent.Source.UserId, ChatType = ChatType.Line },
+                User = new User {ThirdPartyId = messageEvent.Source.UserId, ChatType = ChatType.Line},
                 TimeStamp = messageEvent.Timestamp,
                 Destination = ChatType.ChatInterface
             };
@@ -166,9 +172,9 @@ namespace Communication.Domain.Line
             };
         }
 
-        private LineSendObject ParseToLineSendObject(Message message)
+        private static LineSendObject ParseToLineSendObject(Message message)
         {
-            return new ()
+            return new()
             {
                 UserId = message.User.ThirdPartyId,
                 Content = message.Content,
